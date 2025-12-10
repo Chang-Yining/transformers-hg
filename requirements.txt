@@ -1,6 +1,6 @@
 tqdm
 scipy
-numpy
+numpy==1.26.0
 pandas
 matplotlib
 seaborn

@@ -62,7 +62,7 @@ from data_utils.passiv_helpers import (
     eval_passivization_cls_callback,
 )
 
-WANDB_ENTITY_NAME = "<Insert-Your-Entity-Name>"
+WANDB_ENTITY_NAME = "zhangyn0127-national-tsing-hua-university"
 
 
 class AttrDict(dict):
@@ -304,8 +304,8 @@ def main_lm(args):
                 build_datasets_passivization_cls()
             )
 
-    else:
-        if args.mode != "enc":
+    else: # English Question Formation 
+        if args.mode != "enc": # if language modeling
             if not args.not_lm:
                 datasets, in_vocab, _ = build_datasets_lm(
                     include_only_quest=args.exclude_identity,
@@ -478,6 +478,7 @@ def main_lm(args):
         device = torch.device("cuda:{}".format(args.gpu_id))
     else:
         device = "cpu"
+    print("Using device: {}".format(device))
     model.to(device)
     if args.dataset in ["grammar_gen", "grammar_genv2"]:
         eval_keys = ["test"]
@@ -624,7 +625,7 @@ if __name__ == "__main__":
     set_seed(args)
     ### NOTE: change this to your own wandb project and entity!
     wandb_logger = wandb.init(
-        project="structural-grokking", entity=WANDB_ENTITY_NAME, config=vars(args)
+        project="hiergen-concept-erasure", entity=WANDB_ENTITY_NAME, config=vars(args)
     )
     # To work with wandb sweeps
     args = AttrDict((wandb_logger.config))
@@ -634,6 +635,6 @@ if __name__ == "__main__":
 
     if args.save_dir != "":
         wandb.run.name = "{}-{}".format(args.save_dir, args.seed)
-    wandb.run.save()
+    # wandb.run.save()
 
     main_lm(args)

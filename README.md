@@ -22,6 +22,11 @@ conda install pip
 conda install pytorch==2.1.0 pytorch-cuda=11.8 -c pytorch -c nvidia
 ```
 
+```bash 
+#use pip to prevent mkl conflicts
+pip install torch==2.1.0 pytorch-cuda=12.2 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+```
+
 #### Installing Huggingface Transformers
 We make some changes to the transformers library to support pruning (adapted from [DSP](https://github.com/rycolab/differentiable-subset-pruning)). To install,
 
@@ -46,7 +51,7 @@ Training models on the question formation dataset using different training objec
 
 ```bash
 #"Training with LM Objective"
-python train_transformers.py --encoder_n_layers 6 --callback --dataset lm --max_train_steps 300000 --max_grad_norm 1 --eval_every 1000 --seed 42 --tied-embedding
+python train_transformers.py --encoder_n_layers 6 --callback --dataset lm --max_train_steps 300000 --max_grad_norm 1 --eval_every 1000 --seed 42 --tied-embedding --save_every 1000 --save_dir checkpoints/lm
 
 #"Training with Seq2Seq Objective"
 python train_transformers.py --not_lm --mode enc_dec --encoder_n_layers 6 --decoder_n_layers 6 --callback --dataset lm --max_train_steps 300000 --max_grad_norm 1 --eval_every 1000 --seed 42 --tied-embedding
@@ -79,10 +84,13 @@ python prune_heads_v2.py --model_path <SAVE_DIR>/checkpoint_<CHECKPOINT>.pkl --d
 # For Gen-Prune
 python prune_heads_v2.py --model_path <SAVE_DIR>/checkpoint_<CHECKPOINT>.pkl --dataset qf --n_layer 6 --tied-embedding --split_for_pruning "test" --pruning_steps 10000 --pruning_lr 0.05 --l0_penalty 0.015
 
+python prune_heads_v2.py --model_path checkpoints/lm/checkpoint_15000.pickle --dataset qf --n_layer 6 --tied-embedding --split_for_pruning "test" --pruning_steps 240 --pruning_lr 0.05 --l0_penalty 0.015
+
 # For Train\Gen Prune
 python prune_heads_v2.py --model_path <SAVE_DIR>/checkpoint_<CHECKPOINT>.pkl --dataset qf --n_layer 6 --tied-embedding --split_for_pruning "train" --find_overfitted_heads --pruning_steps 10000 --pruning_lr 0.05 --l0_penalty 0.015
+python prune_heads_v2.py --model_path checkpoints/lm/checkpoint_15000.pickle --dataset qf --n_layer 6 --tied-embedding --split_for_pruning "train" --find_overfitted_heads --pruning_steps 10000 --pruning_lr 0.05 --l0_penalty 0.015
 ```
-
+python prune_heads_v2.py --model_path <SAVE_DIR>/checkpoint_<CHECKPOINT>.pkl --dataset qf --n_layer 6 --tied-embedding --split_for_pruning "train" --find_overfitted_heads --pruning_steps 10000 --pruning_lr 0.05 --l0_penalty 0.015
 To analyse the full training dynamics i.e. run the three pruning methods for all the checkpoints
 
 ```bash

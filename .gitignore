@@ -5,3 +5,7 @@ out
 slurm*
 slurm_out
 .DS_Store
+/checkpoints/*
+train-hiergen.*
+run.sh
+run_net_free.sh
